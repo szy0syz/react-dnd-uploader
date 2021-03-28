@@ -1,5 +1,6 @@
-import { useCallback, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { FileError, FileRejection, useDropzone } from 'react-dropzone';
+import { SingleFileUploadWithProgress } from './SingleFileUploadWithProgress';
 
 export interface UploadabelFile {
   file: File;
@@ -16,16 +17,18 @@ export function MultiplefileUploadField() {
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });
 
   return (
-    <div {...getRootProps()}>
-      <input {...getInputProps()} />
-      <p>Drag 'n' drop some files here, or click to select files</p>
-      {JSON.stringify(files)}
-
-      {/* {isDragActive ? (
-        <p>Drop the files here ...</p>
-      ) : (
+    <React.Fragment>
+      <div {...getRootProps()}>
+        <input {...getInputProps()} />
         <p>Drag 'n' drop some files here, or click to select files</p>
-      )} */}
-    </div>
+        {JSON.stringify(files)}
+      </div>
+      <br />
+      <hr />
+      <br />
+      {files.map((fileWrapper,idx) => (
+        <SingleFileUploadWithProgress key={idx} file={fileWrapper.file} />
+      ))}
+    </React.Fragment>
   );
 }
