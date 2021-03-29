@@ -1,3 +1,4 @@
+import { Grid } from '@material-ui/core';
 import React, { useCallback, useState } from 'react';
 import { FileError, FileRejection, useDropzone } from 'react-dropzone';
 import { SingleFileUploadWithProgress } from './SingleFileUploadWithProgress';
@@ -5,6 +6,7 @@ import { SingleFileUploadWithProgress } from './SingleFileUploadWithProgress';
 export interface UploadabelFile {
   file: File;
   errors: FileError[];
+  url?: string;
 }
 
 export function MultiplefileUploadField() {
@@ -16,18 +18,39 @@ export function MultiplefileUploadField() {
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });
 
+  function onDelete(file: File) {
+    setFiles((curr) => curr.filter((fw) => fw.file !== file));
+  }
+
+  function onUpload(file: File, url: string) {
+    setFiles((curr) =>
+      curr.map((fw) => {
+        if (fw.file === file) {
+          return { ...fw, url };
+        }
+        return fw;
+      })
+    );
+  }
+
   return (
     <React.Fragment>
-      <div {...getRootProps()}>
-        <input {...getInputProps()} />
-        <p>Drag 'n' drop some files here, or click to select files</p>
-        {JSON.stringify(files)}
-      </div>
+      <Grid item>
+        <div {...getRootProps()}>
+          <input {...getInputProps()} />
+          <p>Drag 'n' drop some files here, or click to select files</p>
+        </div>
+      </Grid>
       <br />
-      <hr />
+      {JSON.stringify(files)}
       <br />
-      {files.map((fileWrapper,idx) => (
-        <SingleFileUploadWithProgress key={idx} file={fileWrapper.file} />
+      {files.map((fileWrapper, idx) => (
+        <SingleFileUploadWithProgress
+          key={idx}
+          file={fileWrapper.file}
+          onDelete={onDelete}
+          onUpload={onUpload}
+        />
       ))}
     </React.Fragment>
   );

@@ -1,31 +1,42 @@
 import { useEffect, useState } from 'react';
+import { Grid, LinearProgress } from '@material-ui/core';
+import { FileHeader } from './FileHeader';
 
 const url = 'https://api.cloudinary.com/v1_1/demo/image/upload';
 const key = 'docs_upload_example_us_preset';
 
 export interface SingleFileUploadWithProgressProps {
   file: File;
+  onDelete: (file: File) => void;
+  onUpload: (file: File, url: string) => void;
 }
 
 export function SingleFileUploadWithProgress({
   file,
+  onDelete,
+  onUpload
 }: SingleFileUploadWithProgressProps) {
   const [pregress, setProgress] = useState(0);
 
   useEffect(() => {
     async function upload() {
       const url = await uploadFile(file, setProgress);
-      console.log('~~~~url:', url);
+      onUpload(file, url);
     }
 
     upload();
   }, []);
 
-  return <div>SFU - {pregress}</div>;
+  return (
+    <Grid item>
+      <FileHeader file={file} onDelete={onDelete} />
+      <LinearProgress variant="determinate" value={pregress} />
+    </Grid>
+  );
 }
 
 function uploadFile(file: File, onProgress: (percentage: number) => void) {
-  return new Promise((res, rej) => {
+  return new Promise<string>((res, rej) => {
     const xhr = new XMLHttpRequest();
     xhr.open('POST', url);
 
